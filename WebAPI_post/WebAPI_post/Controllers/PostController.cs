@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using WebAPI_post.Models;
 
 namespace WebAPI_post.Controllers
@@ -72,20 +71,16 @@ namespace WebAPI_post.Controllers
         }
 
         [HttpPost("body/json")]
-        public IActionResult Post7([FromHeader] string name, [FromHeader] int age, [FromBody] JObject obj)
+        public IActionResult Post7([FromHeader] string name, [FromHeader] int age, [FromBody] JsonObject obj)
         {
             try
             {
-                string nameInObj = obj.ContainsKey("name") ? obj["name"].Value<string>() : null;
-                string ageInObj = obj.ContainsKey("age") ? obj["age"].Value<string>() : null;
-                if (nameInObj == null) throw new Exception("null name");
-                if (ageInObj == null) throw new Exception("null age");
-
-                int iAge = int.Parse(ageInObj);
+                string nameInObj = obj.ContainsKey("name") ? obj["name"].GetValue<string>() : null;
+                int ageInObj = obj.ContainsKey("age") ? obj["age"].GetValue<int>() : 0;
 
                 Student newStudent = new Student();
-                newStudent.name = name + "_server";
-                newStudent.age = age + 10;
+                newStudent.name = nameInObj + "_server";
+                newStudent.age = ageInObj + 10;
                 return Ok(newStudent);
             }
             catch(Exception ex)
@@ -93,6 +88,8 @@ namespace WebAPI_post.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        //======================================== to support uploading file ==========================================================
 
         [HttpPost]
         [Route("file/upload")]
