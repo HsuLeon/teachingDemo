@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
-using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
+using WebAPI_put.Models;
 
 namespace WebAPI_put.Controllers
 {
@@ -29,38 +28,70 @@ namespace WebAPI_put.Controllers
             return string.Format("the name is {0}, age is {1}", name, age);
         }
 
-        [HttpPut("body/json")]
-        public string Put4([FromHeader] string name, [FromHeader] int age, [FromBody] JsonObject obj)
+        [HttpPut("body/form")]
+        public Student Put4([FromForm] Student student)
         {
-            return string.Format("the name is {0}, age is {1}, body is {2}", name, age, obj);
+            string name = student.name;
+            int age = student.age;
+
+            Student newStudent = new Student();
+            newStudent.name = name + "_server";
+            newStudent.age = age + 10;
+            return newStudent;
         }
 
         [HttpPut("body/class")]
-        public string Put5([FromBody] Student student)
+        public IActionResult Put5([FromBody] Student student)
         {
             string name = student.name;
             int age = student.age;
 
-            string str1 = student.ToString();
-            string str2 = JsonConvert.SerializeObject(student);
-            return string.Format("the name is {0}, age is {1}, str1 is {2}, str2 is {3}", name, age, str1, str2);
+            Student newStudent = new Student();
+            newStudent.name = name + "_server";
+            newStudent.age = age + 10;
+            return Ok(newStudent);
         }
 
-        public class Student
-        {
-            public string name { get; set; }
-            public int age { get; set; }
-        }
-
-        [HttpPut("body/form")]
-        public string Put6([FromForm] Student student)
+        [HttpPost("body/class2")]
+        public IActionResult Put6([FromForm] Student student)
         {
             string name = student.name;
             int age = student.age;
 
-            string str1 = student.ToString();
-            string str2 = JsonConvert.SerializeObject(student);
-            return string.Format("the name is {0}, age is {1}, str1 is {2}, str2 is {3}", name, age, str1, str2);
+            if (age >= 18)
+            {
+                Student newStudent = new Student();
+                newStudent.name = name + "_server";
+                newStudent.age = age + 10;
+                return Ok(newStudent);
+            }
+            else
+            {
+                return BadRequest("not adult yet");
+            }
+        }
+
+        [HttpPut("body/json")]
+        public IActionResult Put4([FromHeader] string name, [FromHeader] int age, [FromBody] JObject obj)
+        {
+            try
+            {
+                string nameInObj = obj.ContainsKey("name") ? obj["name"].Value<string>() : null;
+                string ageInObj = obj.ContainsKey("age") ? obj["age"].Value<string>() : null;
+                if (nameInObj == null) throw new Exception("null name");
+                if (ageInObj == null) throw new Exception("null age");
+
+                int iAge = int.Parse(ageInObj);
+
+                Student newStudent = new Student();
+                newStudent.name = name + "_server";
+                newStudent.age = age + 10;
+                return Ok(newStudent);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

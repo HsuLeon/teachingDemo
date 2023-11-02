@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json.Linq;
+using WebAPI_delete.Models;
 
 namespace WebAPI_delete.Controllers
 {
@@ -38,12 +39,6 @@ namespace WebAPI_delete.Controllers
             student.name = name;
             student.age = age;
             return student;
-        }
-
-        public class Student
-        {
-            public string name { get; set; }
-            public int age { get; set; }
         }
 
         [HttpDelete("route/{name}")]
