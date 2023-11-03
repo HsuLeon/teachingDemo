@@ -121,15 +121,6 @@ namespace WebAPI_post.Controllers
                         file.CopyTo(stream);
                         stream.Close();
                         stream.Dispose();
-                        //// copy wav content
-                        //byte[] audioDataWithHeader = new byte[stream.Length];
-                        //stream.Seek(0, SeekOrigin.Begin);
-                        //stream.Read(audioDataWithHeader, 0, 32);
-                        //byte headType = audioDataWithHeader[16];
-                        //int headOffset = headType == 0x10 ? 46 : 44;
-                        //byte[] audioData = new byte[audioDataWithHeader.Length - headOffset];
-                        //Array.Copy(audioDataWithHeader, headOffset, audioData, 0, audioData.Length);
-                        //fileBytes.Add(audioData);
                     }));
                 }
                 if (tasks.Count == 0) throw new Exception("no file uploaded");
