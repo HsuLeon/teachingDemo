@@ -115,7 +115,7 @@ namespace WebAPI_put.Controllers
         // 5. add "app.UseAuthentication()" in Program.cs
         //=============================================================================================================================
 
-        private string GenerateJSONWebToken(LoginRequest req)
+        private string GenerateJSONWebToken(string account, string password)
         {
             string? token = null;
             try
@@ -125,9 +125,9 @@ namespace WebAPI_put.Controllers
                 SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
                 Claim[] claims = new[] {
-                    new Claim(JwtRegisteredClaimNames.Sub, req.account != null ? req.account : ""),
-                    new Claim("Name", req.account),
-                    new Claim("Password", req.password),
+                    new Claim(JwtRegisteredClaimNames.Sub, account),
+                    new Claim("Name", account),
+                    new Claim("Password", password),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
                 string issuer = _config["Jwt:Issuer"];
@@ -158,7 +158,7 @@ namespace WebAPI_put.Controllers
                 if (req.account == null) throw new Exception("invalid account");
                 if (req.password == null) throw new Exception("invalid password");
 
-                string tokenString = GenerateJSONWebToken(req);
+                string tokenString = GenerateJSONWebToken(req.account, req.password);
                 response = Ok(new { token = tokenString });
             }
             catch (Exception ex)
