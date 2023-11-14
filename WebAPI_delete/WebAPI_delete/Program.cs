@@ -6,20 +6,26 @@ builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowDev",
-        builder =>
+        policy =>
         {
-            builder.SetIsOriginAllowed(origin => true)
+            policy.SetIsOriginAllowed(origin => true)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
         });
 
     options.AddPolicy("AllowProd",
-        builder =>
+        policy =>
         {
-            builder.WithOrigins("*", "https://cloud.giraffe.com.tw", "http://192.168.20.51:5000", "http://localhost", "http://localhost:3000", "http://localhost:5000") // Replace with your front-end origin
-                   .AllowAnyHeader()
-                   .AllowAnyMethod();
+            policy.WithOrigins(
+                "https://cloud.giraffe.com.tw",
+                "http://192.168.20.51:5000",
+                "http://localhost",
+                "http://localhost:3000",
+                "http://localhost:5000"
+            ) // Replace with your front-end origin
+            .AllowAnyHeader()
+            .AllowAnyMethod();
         });
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
