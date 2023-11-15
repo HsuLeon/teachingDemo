@@ -14,3 +14,6 @@
 /WebAPI_put/WebAPI_put/WebAPI_put.csproj.user
 /WebAPI_put/WebAPI_put/bin
 /WebAPI_put/WebAPI_put/obj
+/WebAPI_db/.vs
+/WebAPI_db/WebAPI_db/obj
+/WebAPI_db/WebAPI_db/bin
