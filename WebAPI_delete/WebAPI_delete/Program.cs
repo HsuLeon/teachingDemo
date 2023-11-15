@@ -8,10 +8,13 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowDev",
         policy =>
         {
-            policy.SetIsOriginAllowed(origin => true)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials();
+            policy.SetIsOriginAllowed(origin =>
+            {
+                return true;
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
         });
 
     options.AddPolicy("AllowProd",
