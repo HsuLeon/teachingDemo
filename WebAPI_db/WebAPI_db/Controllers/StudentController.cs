@@ -10,7 +10,6 @@ namespace WebAPI_db.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-
         [Authorize]
         [HttpGet("info/{id}")]
         public IActionResult QueryByAccount([FromRoute] int id)
@@ -25,6 +24,51 @@ namespace WebAPI_db.Controllers
         {
             List<Student> students = StudentService.Instance.FindStudentByName(name);
             return Ok(students);
+        }
+
+        [Authorize]
+        [HttpPost("info")]
+        public IActionResult Create([FromBody] Student student)
+        {
+            string errMsg = StudentService.Instance.Create(student);
+            if (errMsg ==  null)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(errMsg);
+            }
+        }
+
+        [Authorize]
+        [HttpPut("info/{id}")]
+        public IActionResult Update([FromRoute] int id, [FromBody] Student student)
+        {
+            string errMsg = StudentService.Instance.Update(id, student);
+            if (errMsg == null)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(errMsg);
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("info/{id}")]
+        public IActionResult Delete([FromRoute] int id)
+        {
+            string errMsg = StudentService.Instance.Delete(id);
+            if (errMsg == null)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(errMsg);
+            }
         }
     }
 }

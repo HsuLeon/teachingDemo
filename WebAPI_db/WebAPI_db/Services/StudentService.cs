@@ -1,4 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
+using System.Reflection;
+using System.Security.Principal;
+using System.Xml.Linq;
 using WebAPI_db.Models;
 using WebAPI_db.Utility;
 
@@ -78,14 +81,81 @@ namespace WebAPI_db.Services
             return list;
         }
 
-        public string UpdateStudentInfo(int id, Student student)
+        public string Create(Student student)
         {
             string errMsg = null;
-            // proceed...
+            try
+            {
+                if (student.Name == null || student.Name.Length == 0) throw new Exception("invalid name");
 
+                // query from db...
+                string sqlCmd = string.Format("insert into `mydb`.`student` (`name`, `phoneNo`, `note`, `deleted`) values ('{0}', '{1}', '{2}', '0');", student.Name, student.PhoneNo, student.Note);
+                MySqlCommand cmd = DBAgent.Instance.BuildCmd(sqlCmd);
+                int iRow = cmd.ExecuteNonQuery();
+            }
+            catch(Exception ex)
+            {
+                errMsg = ex.Message;
+            }
             return errMsg;
         }
 
+        public string Update(int id, Student student)
+        {
+            string errMsg = null;
+            try
+            {
+                Student? curStudent = this.FindStudentById(id);
+                if (curStudent == null) throw new Exception(string.Format("no student for id:{0}", id));
 
+                string strContent = "";
+                if (curStudent.Name != student.Name)
+                {
+                    if (strContent.Length > 0) strContent += ", ";
+                    strContent += string.Format("`name` = '{0}'", student.Name);
+                }
+                if (curStudent.PhoneNo != student.PhoneNo)
+                {
+                    if (strContent.Length > 0) strContent += ", ";
+                    strContent += string.Format("`phoneNo` = '{0}'", student.PhoneNo);
+                }
+                if (curStudent.Note != student.Note)
+                {
+                    if (strContent.Length > 0) strContent += ", ";
+                    strContent += string.Format("`note` = '{0}'", student.Note);
+                }
+
+                // query from db...
+                string sqlCmd = string.Format("update `mydb`.`student` set {0} where (`id` = '{1}');", strContent, id);
+                MySqlCommand cmd = DBAgent.Instance.BuildCmd(sqlCmd);
+                int iRow = cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                errMsg = ex.Message;
+            }
+            return errMsg;
+        }
+
+        public string Delete(int id)
+        {
+            string errMsg = null;
+            try
+            {
+                Student? student = this.FindStudentById(id);
+                if (student == null) throw new Exception(string.Format("no student for id:{0}", id));
+
+                // query from db...
+                string sqlCmd = string.Format("update `mydb`.`student` set `deleted` = '1' where (`id` = '{0}');", id);
+                //string sqlCmd = string.Format("delete from `mydb`.`student` where (`id` = '{0}');", id);
+                MySqlCommand cmd = DBAgent.Instance.BuildCmd(sqlCmd);
+                int iRow = cmd.ExecuteNonQuery();
+            }
+            catch(Exception ex)
+            {
+                errMsg = ex.Message;
+            }
+            return errMsg;
+        }
     }
 }

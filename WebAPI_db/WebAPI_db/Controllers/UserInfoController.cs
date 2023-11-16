@@ -33,10 +33,10 @@ namespace WebAPI_db.Controllers
                 SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
                 SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-                long expiredAt = DateTime.Now.Ticks + 24 * 60 * 60;
+                DateTime expiredDate = DateTime.Now.AddHours(24);
+                long expiredAt = expiredDate.Ticks;
                 Claim[] claims = new[] {
                     new Claim("Account", userInfo.Account),
-                    new Claim("Password", userInfo.Password),
                     new Claim("ExpiredAt", expiredAt.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
@@ -68,7 +68,7 @@ namespace WebAPI_db.Controllers
                 if (req.Account == null) throw new Exception("invalid account");
                 if (req.Password == null) throw new Exception("invalid password");
 
-                UserInfo userInfo = UserInfoService.Instance.FindByAccount(req.Account);
+                UserInfo? userInfo = UserInfoService.Instance.FindByAccount(req.Account);
                 if (userInfo == null || userInfo.Password != req.Password) throw new Exception("invalid account or password");
 
                 string tokenString = GenerateJSONWebToken(userInfo);
@@ -92,8 +92,10 @@ namespace WebAPI_db.Controllers
                 if (userInfo.Password == null) throw new Exception("invalid password");
 
                 if (userInfo.Name == null || userInfo.Name.Length == 0) userInfo.Name = userInfo.Account;
-                userInfo.Gender = 0;
-                response = Ok(userInfo);
+                string? errMsg = UserInfoService.Instance.Create(userInfo.Account, userInfo.Password, userInfo.Name, userInfo.Gender);
+                if (errMsg != null) throw new Exception(errMsg);
+
+                response = Ok();
             }
             catch (Exception ex)
             {
@@ -116,11 +118,44 @@ namespace WebAPI_db.Controllers
                 JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(token);
                 // 讀取 token 中的 claims
                 Claim? accountClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "Account");
-                Claim? passwordClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "Password");
                 Claim? expiredAtClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "ExpiredAt");
                 DateTime expiredTime = new DateTime(long.Parse(expiredAtClaim.Value));
 
-                return Ok(string.Format("account:{0}, password:{1}, expiredAt:{2}", accountClaim?.Value, passwordClaim?.Value, expiredTime));
+                return Ok(string.Format("account:{0}, expiredAt:{1}", accountClaim?.Value, expiredTime));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPut("password")]
+        public IActionResult ChangePassword([FromHeader] string Password)
+        {
+            try
+            {
+                // 取得 Bearer token
+                string token_original = HttpContext.Request.Headers["Authorization"].ToString();
+                string token = token_original.Replace("Bearer ", "");
+                // 將 token 解析成 JWT token 物件
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+                JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(token);
+                // 讀取 token 中的 claims
+                Claim? accountClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "Account");
+                Claim? expiredAtClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "ExpiredAt");
+                DateTime expiredTime = new DateTime(long.Parse(expiredAtClaim.Value));
+
+                TimeSpan ts = DateTime.Now - expiredTime;
+                if (ts.TotalSeconds > 0) throw new Exception("token expired, need to re-login");
+
+                UserInfo? userInfo = UserInfoService.Instance.FindByAccount(accountClaim.Value);
+                if (userInfo == null) throw new Exception(string.Format("no userInfo for {0}", accountClaim.Value));
+
+                string? errMsg = UserInfoService.Instance.ChangePassword(accountClaim.Value, Password);
+                if (errMsg != null) throw new Exception(errMsg);
+
+                return Ok(string.Format("account:{0}, expiredAt:{1}", accountClaim?.Value, expiredTime));
             }
             catch (Exception ex)
             {
