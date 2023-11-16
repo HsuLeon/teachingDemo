@@ -69,6 +69,7 @@ namespace WebAPI_db.Controllers
                 if (req.Password == null) throw new Exception("invalid password");
 
                 UserInfo userInfo = UserInfoService.Instance.FindByAccount(req.Account);
+                if (userInfo == null || userInfo.Password != req.Password) throw new Exception("invalid account or password");
 
                 string tokenString = GenerateJSONWebToken(userInfo);
                 response = Ok(tokenString);

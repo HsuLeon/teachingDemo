@@ -12,10 +12,10 @@ namespace WebAPI_db.Controllers
     {
 
         [Authorize]
-        [HttpGet("info/{account}")]
-        public IActionResult QueryByAccount([FromRoute] string account)
+        [HttpGet("info/{id}")]
+        public IActionResult QueryByAccount([FromRoute] int id)
         {
-            Student student = StudentService.Instance.FindStudentByAccount(account);
+            Student student = StudentService.Instance.FindStudentById(id);
             return Ok(student);
         }
 

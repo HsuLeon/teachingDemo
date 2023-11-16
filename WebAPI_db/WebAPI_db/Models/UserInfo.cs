@@ -1,4 +1,4 @@
-﻿namespace WebAPI_put.Models
+﻿namespace WebAPI_db.Models
 {
     public class UserInfo
     {

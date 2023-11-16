@@ -1,11 +1,12 @@
 ﻿
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace WebAPI_db.Utility
 {
     public class DBAgent
     {
-        const string myConnectionString = "server=localhost;database=myjpa;uid=root;pwd=Girf@55825168;";
+        const string myConnectionString = "server=localhost;database=mydb;uid=root;pwd=Girf@55825168;";
 
         static DBAgent mInstance = null;
         MySqlConnection mCnn;
@@ -56,6 +57,12 @@ namespace WebAPI_db.Utility
                 errMsg = ex.Message;
             }
             return errMsg;
+        }
+
+        public MySqlCommand BuildCmd(string sqlCmd)
+        {
+            MySqlCommand cmd = new MySqlCommand(sqlCmd, mCnn);
+            return cmd;
         }
 
     }
