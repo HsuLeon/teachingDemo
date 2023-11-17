@@ -14,7 +14,7 @@ namespace WebAPI_db.Controllers
         [HttpGet("info/{id}")]
         public IActionResult QueryByAccount([FromRoute] int id)
         {
-            Student student = StudentService.Instance.FindStudentById(id);
+            Student? student = StudentService.Instance.FindStudentById(id);
             return Ok(student);
         }
 
@@ -30,7 +30,7 @@ namespace WebAPI_db.Controllers
         [HttpPost("info")]
         public IActionResult Create([FromBody] Student student)
         {
-            string errMsg = StudentService.Instance.Create(student);
+            string? errMsg = StudentService.Instance.Create(student);
             if (errMsg ==  null)
             {
                 return Ok();
@@ -45,7 +45,7 @@ namespace WebAPI_db.Controllers
         [HttpPut("info/{id}")]
         public IActionResult Update([FromRoute] int id, [FromBody] Student student)
         {
-            string errMsg = StudentService.Instance.Update(id, student);
+            string? errMsg = StudentService.Instance.Update(id, student);
             if (errMsg == null)
             {
                 return Ok();
@@ -60,7 +60,7 @@ namespace WebAPI_db.Controllers
         [HttpDelete("info/{id}")]
         public IActionResult Delete([FromRoute] int id)
         {
-            string errMsg = StudentService.Instance.Delete(id);
+            string? errMsg = StudentService.Instance.Delete(id);
             if (errMsg == null)
             {
                 return Ok();

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,7 +21,7 @@ namespace WebAPI_db.Controllers
             _config = config;
         }
 
-        private string GenerateJSONWebToken(UserInfo userInfo)
+        private string? GenerateJSONWebToken(UserInfo userInfo)
         {
             string? token = null;
             try
@@ -53,7 +52,7 @@ namespace WebAPI_db.Controllers
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
             }
             return token;
         }
@@ -71,7 +70,9 @@ namespace WebAPI_db.Controllers
                 UserInfo? userInfo = UserInfoService.Instance.FindByAccount(req.Account);
                 if (userInfo == null || userInfo.Password != req.Password) throw new Exception("invalid account or password");
 
-                string tokenString = GenerateJSONWebToken(userInfo);
+                string? tokenString = GenerateJSONWebToken(userInfo);
+                if (tokenString == null) throw new Exception("null tokenString");
+
                 response = Ok(tokenString);
             }
             catch (Exception ex)
@@ -105,7 +106,7 @@ namespace WebAPI_db.Controllers
         }
 
         [Authorize]
-        [HttpPut("verify")]
+        [HttpGet("verify")]
         public IActionResult VerifyToken()
         {
             try

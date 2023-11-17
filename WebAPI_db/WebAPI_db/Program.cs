@@ -8,11 +8,37 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowDev",
+        policy =>
+        {
+            policy.SetIsOriginAllowed(origin =>
+            {
+                return true;
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+        });
+
+    options.AddPolicy("AllowProd",
+        policy =>
+        {
+            policy.WithOrigins(
+                "http://localhost",
+                "http://localhost:3000",
+                "http://localhost:5000"
+            ) // Replace with your front-end origin
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        });
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MySQL CRUD", Version = "v1" });
 
     // 定義 Bearer 身份驗證的安全定義
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -49,6 +75,8 @@ var app = builder.Build();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+//app.UseCors("AllowProd");
+app.UseCors("AllowDev");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

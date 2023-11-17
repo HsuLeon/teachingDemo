@@ -22,8 +22,8 @@ namespace WebAPI_db.Services
 
         public Student? FindStudentById(int id)
         {
-            Student student = null;
-            MySqlDataReader reader = null;
+            Student? student = null;
+            MySqlDataReader? reader = null;
             try
             {
                 // query from db...
@@ -54,7 +54,7 @@ namespace WebAPI_db.Services
         public List<Student> FindStudentByName(string name)
         {
             List<Student> list = new List<Student>();
-            MySqlDataReader reader = null;
+            MySqlDataReader? reader = null;
             try
             {
                 // query from db...
@@ -81,9 +81,9 @@ namespace WebAPI_db.Services
             return list;
         }
 
-        public string Create(Student student)
+        public string? Create(Student student)
         {
-            string errMsg = null;
+            string? errMsg = null;
             try
             {
                 if (student.Name == null || student.Name.Length == 0) throw new Exception("invalid name");
@@ -100,9 +100,9 @@ namespace WebAPI_db.Services
             return errMsg;
         }
 
-        public string Update(int id, Student student)
+        public string? Update(int id, Student student)
         {
-            string errMsg = null;
+            string? errMsg = null;
             try
             {
                 Student? curStudent = this.FindStudentById(id);
@@ -137,9 +137,9 @@ namespace WebAPI_db.Services
             return errMsg;
         }
 
-        public string Delete(int id)
+        public string? Delete(int id)
         {
-            string errMsg = null;
+            string? errMsg = null;
             try
             {
                 Student? student = this.FindStudentById(id);

@@ -1,6 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using System.Reflection;
-using System.Xml.Linq;
 using WebAPI_db.Models;
 using WebAPI_db.Utility;
 
@@ -44,7 +42,7 @@ namespace WebAPI_db.Services
         public UserInfo? FindByAccount(string account)
         {
             UserInfo? userInfo = null;
-            MySqlDataReader reader = null;
+            MySqlDataReader? reader = null;
             try
             {
                 // query from db...
