@@ -99,7 +99,7 @@ namespace WebAPI_db.Controllers
                 string? errMsg = UserInfoService.Instance.Create(userInfo.Account, userInfo.Password, userInfo.Name, userInfo.Gender);
                 if (errMsg != null) throw new Exception(errMsg);
 
-                response = Ok();
+                response = Ok("Ok");
             }
             catch (Exception ex)
             {

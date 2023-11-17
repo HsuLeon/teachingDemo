@@ -70,7 +70,7 @@ namespace WebAPI_db.Controllers
             string? errMsg = StudentService.Instance.Update(id, student);
             if (errMsg == null)
             {
-                return Ok();
+                return Ok("Ok");
             }
             else
             {
@@ -85,7 +85,7 @@ namespace WebAPI_db.Controllers
             string? errMsg = StudentService.Instance.Delete(id);
             if (errMsg == null)
             {
-                return Ok();
+                return Ok("Ok");
             }
             else
             {
