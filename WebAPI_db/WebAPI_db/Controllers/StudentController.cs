@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI_db.Models;
 using WebAPI_db.Services;
@@ -10,6 +9,14 @@ namespace WebAPI_db.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
+        [Authorize]
+        [HttpGet("all")]
+        public IActionResult QueryAll()
+        {
+            List<Student> students = StudentService.Instance.GetAllStudent();
+            return Ok(students);
+        }
+
         [Authorize]
         [HttpGet("info/{id}")]
         public IActionResult QueryByAccount([FromRoute] int id)
@@ -33,7 +40,7 @@ namespace WebAPI_db.Controllers
             string? errMsg = StudentService.Instance.Create(student);
             if (errMsg ==  null)
             {
-                return Ok();
+                return Ok("Ok");
             }
             else
             {

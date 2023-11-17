@@ -32,7 +32,8 @@ namespace WebAPI_db.Controllers
                 SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
                 SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-                DateTime expiredDate = DateTime.Now.AddHours(24);
+                const int expiringHours = 24;
+                DateTime expiredDate = DateTime.Now.AddHours(expiringHours);
                 long expiredAt = expiredDate.Ticks;
                 Claim[] claims = new[] {
                     new Claim("Account", userInfo.Account),
@@ -40,12 +41,14 @@ namespace WebAPI_db.Controllers
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 };
                 string issuer = _config["Jwt:Issuer"];
+                string audience = _config["Jwt:Issuer"];
                 JwtSecurityToken jwtToken = new JwtSecurityToken(
                     issuer,
-                    issuer,
+                    audience,
                     claims,
-                    expires: DateTime.Now.AddHours(12),
-                    signingCredentials: credentials);
+                    expires: expiredDate,
+                    signingCredentials: credentials
+                );
 
                 JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
                 token = handler.WriteToken(jwtToken);
