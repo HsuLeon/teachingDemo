@@ -46,7 +46,7 @@ namespace WebAPI_db.Services
             try
             {
                 // query from db...
-                string sqlCmd = string.Format("select * from user_info where account = \"{0}\"", account);
+                string sqlCmd = string.Format("select * from user_info where account = '{0}'", account);
                 MySqlCommand cmd = DBAgent.Instance.BuildCmd(sqlCmd);
                 reader = cmd.ExecuteReader();
                 while (reader.Read())

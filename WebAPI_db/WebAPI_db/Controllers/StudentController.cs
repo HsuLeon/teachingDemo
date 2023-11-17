@@ -17,6 +17,21 @@ namespace WebAPI_db.Controllers
             return Ok(students);
         }
 
+        [AllowAnonymous]
+        [HttpGet("signup")]
+        public IActionResult Signup([FromBody] Student student)
+        {
+            string? errMsg = StudentService.Instance.Create(student);
+            if (errMsg == null)
+            {
+                return Ok("Ok");
+            }
+            else
+            {
+                return BadRequest(errMsg);
+            }
+        }
+
         [Authorize]
         [HttpGet("info/{id}")]
         public IActionResult QueryByAccount([FromRoute] int id)

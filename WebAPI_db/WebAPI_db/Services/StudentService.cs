@@ -89,7 +89,7 @@ namespace WebAPI_db.Services
             try
             {
                 // query from db...
-                string sqlCmd = string.Format("select * from student where name = {0} and deleted = 0", name);
+                string sqlCmd = string.Format("select * from student where name = '{0}' and deleted = 0", name);
                 MySqlCommand cmd = DBAgent.Instance.BuildCmd(sqlCmd);
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
