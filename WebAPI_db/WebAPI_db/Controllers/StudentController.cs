@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Ocsp;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using WebAPI_db.Models;
 using WebAPI_db.Services;
 
@@ -9,16 +12,8 @@ namespace WebAPI_db.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        [Authorize]
-        [HttpGet("all")]
-        public IActionResult QueryAll()
-        {
-            List<Student> students = StudentService.Instance.GetAllStudent();
-            return Ok(students);
-        }
-
         [AllowAnonymous]
-        [HttpGet("signup")]
+        [HttpPost("signup")]
         public IActionResult Signup([FromBody] Student student)
         {
             string? errMsg = StudentService.Instance.Create(student);
@@ -33,8 +28,16 @@ namespace WebAPI_db.Controllers
         }
 
         [Authorize]
+        [HttpGet("all")]
+        public IActionResult QueryAll()
+        {
+            List<Student> students = StudentService.Instance.GetAllStudent();
+            return Ok(students);
+        }
+
+        [Authorize]
         [HttpGet("info/{id}")]
-        public IActionResult QueryByAccount([FromRoute] int id)
+        public IActionResult QueryById([FromRoute] int id)
         {
             Student? student = StudentService.Instance.FindStudentById(id);
             return Ok(student);
@@ -52,6 +55,18 @@ namespace WebAPI_db.Controllers
         [HttpPost("info")]
         public IActionResult Create([FromBody] Student student)
         {
+            // 取得 Bearer token
+            string token_original = HttpContext.Request.Headers["Authorization"].ToString();
+            string token = token_original.Replace("Bearer ", "");
+            // 將 token 解析成 JWT token 物件
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityToken parsedToken = tokenHandler.ReadJwtToken(token);
+            // 讀取 token 中的 claims
+            Claim? accountClaim = parsedToken.Claims.FirstOrDefault(c => c.Type == "Account");
+
+            UserInfo? userInfo = UserInfoService.Instance.FindByAccount(accountClaim.Value);
+            if (userInfo == null) throw new Exception("invalid account");
+
             string? errMsg = StudentService.Instance.Create(student);
             if (errMsg ==  null)
             {
