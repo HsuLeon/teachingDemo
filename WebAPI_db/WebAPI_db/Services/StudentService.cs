@@ -1,7 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using System.Reflection;
-using System.Security.Principal;
-using System.Xml.Linq;
 using WebAPI_db.Models;
 using WebAPI_db.Utility;
 
@@ -49,7 +46,6 @@ namespace WebAPI_db.Services
             if (reader != null) reader.Close();
             return list;
         }
-
 
         public Student? FindStudentById(int id)
         {
