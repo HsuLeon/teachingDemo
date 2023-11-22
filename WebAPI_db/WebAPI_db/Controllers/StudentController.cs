@@ -16,14 +16,18 @@ namespace WebAPI_db.Controllers
         [HttpPost("signup")]
         public IActionResult Signup([FromBody] Student student)
         {
-            string? errMsg = StudentService.Instance.Create(student);
-            if (errMsg == null)
+            try
             {
+                List<Student> list = StudentService.Instance.FindStudentByName(student.Name);
+                if (list.Count > 0) throw new Exception("already exists");
+
+                string? errMsg = StudentService.Instance.Create(student);
+                if (errMsg != null) throw new Exception(errMsg);
                 return Ok("Ok");
             }
-            else
+            catch(Exception ex)
             {
-                return BadRequest(errMsg);
+                return BadRequest(ex.Message);
             }
         }
 
